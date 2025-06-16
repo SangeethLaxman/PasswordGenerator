@@ -10,10 +10,14 @@ upchar = string.ascii_uppercase
 lowchar = string.ascii_lowercase
 numchar = range(0,10)
 
+root = Tk()
+frm = ttk.Frame(root, padding=10,borderwidth=100)
+frm.grid()
+
 characters = {
     "special": [
         ["$","%","&","!","?","@","#","_","-","+","="], #List of characters
-        True #Enabled?
+        ttk.Checkbutton(root,text="Special Characters?",) #Enabled?
     ],
     "upchar": [
         [x for x in string.ascii_uppercase], #List of characters
@@ -28,13 +32,12 @@ characters = {
         True #Enabled?
     ]
 }
+characters["special"][1].grid(row=3,column=0)
 
 print(characters)
 
 #Initialize Root
-root = Tk()
-frm = ttk.Frame(root, padding=10,borderwidth=100)
-frm.grid()
+
 
 passlabel = Label(frm, text="__________", )
 passlabel.grid(column=0, row=0)
