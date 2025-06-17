@@ -35,7 +35,7 @@ passfrm = Frame(
 settfrm = LabelFrame(mainfrm, 
     border=10, 
     padx=10, 
-    width=60000,
+    width=300,
     height=250,
     background="#D9DBF1",
     text="Password Settings",
@@ -45,6 +45,7 @@ settfrm = LabelFrame(mainfrm,
     highlightbackground="#0D1B1E",
     labelanchor="n",
 )
+settfrm.grid_propagate(False)
 
 passfrm.grid(pady=10)
 fullroot.pack(fill=BOTH, expand=True)
