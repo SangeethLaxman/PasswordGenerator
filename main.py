@@ -49,7 +49,7 @@ fullroot.pack(fill=BOTH, expand=True)
 mainfrm.pack(anchor=CENTER)
 settfrm.grid(row=2,pady=10,rowspan=3)
 
-warninglabel=Label(settfrm, text="Select atleast one checkbox",fg="red",font=("Arial",10,"bold"),border=10,padx=1, pady=1,background="#D9DBF1")
+warninglabel=Label(settfrm, text="Minimum one checkbox allowed",fg="red",font=("Arial",5,"bold"),border=10,padx=1, pady=1,background="#D9DBF1")
 
 
 characters = {
@@ -86,11 +86,11 @@ def validatecheckboxes():
         for i in characters:
             if characters[i][2].get():
                 characters[i][1].config(state=DISABLED)
-        warninglabel.grid_forget()
+        warninglabel.grid(column=0,row=8,sticky="w")
     else:
         for i in characters:
             characters[i][1].config(state=NORMAL)
-        warninglabel.grid(column=0,row=8,sticky="w")
+        warninglabel.grid_forget()
 
 
 for j in characters:
