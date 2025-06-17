@@ -42,13 +42,14 @@ settfrm = LabelFrame(mainfrm,
     highlightthickness=4,
     highlightbackground="#0D1B1E",
     labelanchor="n",
-    width=100,
 )
 
 passfrm.grid(pady=10)
 fullroot.pack(fill=BOTH, expand=True)
 mainfrm.pack(anchor=CENTER)
-settfrm.grid(row=2,pady=10)
+settfrm.grid(row=2,pady=10,rowspan=3)
+
+warninglabel=Label(settfrm, text="Select atleast one checkbox",fg="red",font=("Arial",10,"bold"),border=10,padx=1, pady=1,background="#D9DBF1")
 
 
 characters = {
@@ -75,6 +76,7 @@ characters = {
     ]
 }
 
+
 def validatecheckboxes():
     x=0
     for i in characters:
@@ -84,10 +86,11 @@ def validatecheckboxes():
         for i in characters:
             if characters[i][2].get():
                 characters[i][1].config(state=DISABLED)
+        warninglabel.grid_forget()
     else:
         for i in characters:
             characters[i][1].config(state=NORMAL)
-
+        warninglabel.grid(column=0,row=8,sticky="w")
 
 
 for j in characters:
@@ -101,6 +104,7 @@ for j in characters:
         command=validatecheckboxes,
         selectcolor="light green",
         background="#D9DBF1",
+        highlightthickness=0,
     )
 print(characters)
 
@@ -128,7 +132,7 @@ def genpassword():
 
     passlabel.config(text=pw)
 
-Label(settfrm, text="Password Length",font=("Arial",10,"bold")).grid(column=0,row=1,sticky="w",bg="#D9DBF1")
+Label(settfrm, text="Password Length",font=("Arial",10,"bold"),bg="#D9DBF1").grid(column=0,row=1,sticky="w")
 
 lenslider = Scale(
     settfrm, 
@@ -143,7 +147,14 @@ lenslider = Scale(
 
 lenslider.grid(column=0,row=2,sticky="w")
 
-ttk.Button(mainfrm, text="Generate", command=genpassword).grid(column=0,row=1)
+ttk.Button(
+    mainfrm, 
+    text="Generate", 
+    command=genpassword
+).grid(
+    column=0,
+    row=1
+)
 
 genpassword()
 
