@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 import random
 import string
+import zxcvbn
 
 
 #Obtain list of characters
@@ -11,54 +12,139 @@ lowchar = string.ascii_lowercase
 numchar = range(0,10)
 
 root = Tk()
-frm = ttk.Frame(root, padding=10,borderwidth=100)
-frm.grid()
+
+root.title("Password Generator")
+root.geometry("500x500")
+fullroot = Frame(root, background="#7D84B2")
+mainfrm = Frame(fullroot,
+    border=10,
+    padx=100, 
+    pady= 100,
+    background="#7D84B2",
+        
+)
+passfrm = Frame(
+    mainfrm,
+    border=10,
+    padx = 20,
+    highlightbackground="#0D1B1E",
+    highlightthickness=4,
+    background="#C3DBC5"
+)
+
+settfrm = LabelFrame(mainfrm, 
+    border=10, 
+    padx=10, 
+    background="#D9DBF1",
+    text="Password Settings",
+    font=("Arial",13,"bold"),
+    relief="flat",
+    highlightthickness=4,
+    highlightbackground="#0D1B1E",
+    labelanchor="n",
+    width=100,
+)
+
+passfrm.grid(pady=10)
+fullroot.pack(fill=BOTH, expand=True)
+mainfrm.pack(anchor=CENTER)
+settfrm.grid(row=2,pady=10)
+
 
 characters = {
     "special": [
         ["$","%","&","!","?","@","#","_","-","+","="], #List of characters
-        ttk.Checkbutton(root,text="Special Characters?",) #Enabled?
+        Checkbutton(settfrm,text="Special Characters?"), #CheckBox
+        BooleanVar(value=True)
     ],
     "upchar": [
         [x for x in string.ascii_uppercase], #List of characters
-        True #Enabled?
+        Checkbutton(settfrm,text="Uppercase Characters?" ),#Checkbox
+        BooleanVar(value=True)
+        
     ],
     "lowchar": [
         [x for x in string.ascii_lowercase], #List of characters
-        True #Enabled?
+        Checkbutton(settfrm,text="Lowercase Characters?",), #Checkbox
+        BooleanVar(value=True)
     ],
     "numbers": [
         [str(x) for x in range(0,10)], #List of characters
-        True #Enabled?
+        Checkbutton(settfrm,text="Numbers?"), #Checkbox
+        BooleanVar(value=True)
     ]
 }
-characters["special"][1].grid(row=3,column=0)
 
+def validatecheckboxes():
+    x=0
+    for i in characters:
+        if characters[i][2].get():
+            x+=1
+    if x == 1:
+        for i in characters:
+            if characters[i][2].get():
+                characters[i][1].config(state=DISABLED)
+    else:
+        for i in characters:
+            characters[i][1].config(state=NORMAL)
+
+
+
+for j in characters:
+    characters[j][1].grid(
+        column=0,
+        row=3+list(characters.keys()).index(j),
+        sticky="w"
+    )
+    characters[j][1].config(
+        variable=characters[j][2],
+        command=validatecheckboxes,
+        selectcolor="light green",
+        background="#D9DBF1",
+    )
 print(characters)
 
 #Initialize Root
 
 
-passlabel = Label(frm, text="__________", )
+passlabel = Label(passfrm, text="__________",fg="blue",font=("Arial",15,"bold"),border=10,padx=1, pady=1,background="#C3DBC5")
+
 passlabel.grid(column=0, row=0)
 
 def genpassword():
     print(lenslider.get())
     validchars = []
     for i in characters:
-        if characters[i][1]:
+        if characters[i][2].get():
             validchars +=characters[i][0]
 
     pw =""
-
+    print(validchars)
     for j in range(lenslider.get()):
-        pw+=validchars[random.randint(0,len(validchars))]
+        e = random.randint(0,len(validchars))
+        print(e)
+        print("length", len(validchars))
+        pw += validchars[e-1]
 
     passlabel.config(text=pw)
 
+Label(settfrm, text="Password Length",font=("Arial",10,"bold")).grid(column=0,row=1,sticky="w",bg="#D9DBF1")
 
+lenslider = Scale(
+    settfrm, 
+    from_=8, 
+    to=40, 
+    orient=HORIZONTAL,
+    sliderlength=10,
+    length=200,
+    showvalue=False,
+    bg="#D9DBF1"
+)
 
-lenslider = Scale(root, from_=8, to=18, orient=HORIZONTAL)
-lenslider.grid(column=0,row=2)
-ttk.Button(frm, text="Generate", command=genpassword).grid(column=0, row=1)
+lenslider.grid(column=0,row=2,sticky="w")
+
+ttk.Button(mainfrm, text="Generate", command=genpassword).grid(column=0,row=1)
+
+genpassword()
+
 root.mainloop()

@@ -1,0 +1,19 @@
+version = 1
+requires-python = ">=3.12"
+
+[[package]]
+name = "workspace"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "zxcvbn" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "zxcvbn", specifier = "==4.4.28" }]
+
+[[package]]
+name = "zxcvbn"
+version = "4.4.28"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/54/67/c6712608c99e7720598e769b8fb09ebd202119785adad0bbce25d330243c/zxcvbn-4.4.28.tar.gz", hash = "sha256:151bd816817e645e9064c354b13544f85137ea3320ca3be1fb6873ea75ef7dc1", size = 407871 }
