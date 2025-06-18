@@ -1,10 +1,20 @@
-from tkinter import *
+import os
+
+from tkinter import * #GUI
 from tkinter import ttk
+
 import random
 import string
-from tkinter import font 
-import zxcvbn #Password Strength Estimation Library by Dropbox
+
+
+import time # Time library to calculate time spent on generating password (debugging)
 from customtkinter import * #Custom Tkinter Library for better UI
+os.system("pip install zxcvbn colour") #Install the zxcvbn and colour libraries
+import colour #Colour library for color manipulation and processing
+import zxcvbn #ZXCVBN Password Strength Estimation Library by Dropbox
+
+
+
 
 
 #Obtain list of characters
@@ -21,53 +31,55 @@ strengths=[
     ["Very Strong","light green"],
     ["Extremely Strong","green"]
 ]
+
 #init root
 root = CTk()
 root.title("Password Generator")
-root.geometry("500x500")
+root.geometry("770x330")
+root.resizable(False,False)
 
 
 #init frames
 fullroot = CTkFrame(
-    root, 
-    fg_color="#7D84B2"
+    root,
 )
 
 mainfrm = CTkFrame(
     fullroot,
-    fg_color="#7D84B2",
-    border_width=5,
-    border_color= "#7D84B2"
+    #fg_color="red"
+    #width=500,
+    #height=500
+    #border_width=5,
+
 )
 
 passfrm = CTkFrame(
     mainfrm,
+
     #border_width=,
-    border_color= "#C3DBC5",
-    fg_color="#C3DBC5"
 )
 
 settfrm = CTkFrame(
     mainfrm, 
-    width=400,
-    height=250,
-    fg_color="#D9DBF1",
+    #width=275,
+    #height=250,
+    #padx = 10,
     #text="Password Settings",
-    #border_width=5,
+    border_width=5,
+    #fg_color="red"
     #border_color= "#0D1B1E"
 )
 
 #grid the frames
-settfrm.grid_propagate(False)
-passfrm.grid(pady=10)
-fullroot.pack(fill=BOTH, expand=True)
-mainfrm.pack(anchor=CENTER)
-settfrm.grid(row=2,pady=10,rowspan=3)
+fullroot.pack()
+mainfrm.pack(anchor="w",expand=True,fill=BOTH)
+passfrm.grid(row=0,column=0,padx=10,sticky=NSEW,pady=10)
+settfrm.grid(row=0,column=1,padx=10)
 
 #Intialize Checkbox Dictionary
 characters = {
     "special": [
-        ["$","%","&","!","?","@","#","_","-","+","="], #List of characters
+        ["$","%","&","!","?","@","#","_","+","="], #List of characters
         CTkCheckBox(settfrm,text="Special Characters?"), #CheckBox
         BooleanVar(value=True) #Boolean Variable to be assigned to checkbox
     ],
@@ -93,7 +105,7 @@ characters = {
 warninglabel=CTkLabel(
     settfrm,
     text="Minimum one checkbox should be enabled",
-    font=("Arial",7,"bold"),
+    font=("Arial",14,"bold"),
     text_color="red",
     padx=1,
     pady=1,
@@ -113,7 +125,7 @@ def validatecheckboxes():
                 characters[i][1].configure(state=DISABLED) #Disable the checkbox
         
         warninglabel.configure(text="Minimum one checkbox should be enabled",)
-        warninglabel.grid(column=0,row=9,sticky="w") #Display warning label
+        warninglabel.grid(column=0,row=9,sticky="w",padx=10, pady=10) #Display warning label
     
     else:
         for i in characters:
@@ -126,7 +138,8 @@ for j in characters:
     characters[j][1].grid(
         column=0,
         row=3+list(characters.keys()).index(j),
-        sticky="w"
+        sticky="w",
+        padx=10
     )
     
     characters[j][1].configure(
@@ -138,13 +151,27 @@ for j in characters:
 strengthlabel = CTkLabel( #Label to display the password strength
     passfrm,
     text="Password Strength: None",
-    font=("Arial",10,"bold"),
-    fg_color="#11270B",
-    pady=10
+    font=("Arial",20,"bold"),
+    pady=10,
+    padx=50
 )
 
 
-def strengthcheck(pw: str):
+
+
+passentry = CTkTextbox( #Label to display password
+    passfrm,
+    #foreground="blue",
+    font=("Arial",15,"bold"),
+    #background="#C3DBC5",
+)
+
+
+def strengthcheck():
+    temp = passentry.get("1.0","end-1c")
+    passentry.delete("1.0","end")
+    passentry.insert("0.0",temp.replace("\n",""),)
+    pw = passentry.get("1.0","end-1c").strip()
     print("Checking password ", f"'{pw}'"," using zxcvbn...")
     result = zxcvbn.zxcvbn(pw) #Put the password through the zxcvbn's zxcvbn function and receive back a dictionary of results
     score = result["score"] #Obtain the score from the dictionary
@@ -152,25 +179,22 @@ def strengthcheck(pw: str):
     print("Password Score: ",score)
     print("Number of Guesses: ", result["guesses"])
     print("Time which will be taken to crack: ", result["crack_times_display"]["online_no_throttling_10_per_second"])
-    strengthlabel.configure(text=f"Password Strength: {strengths[score][0]}",
-    text_color=strengths[score][1])
+    strengthlabel.configure(
+        text=f"Password Strength: {strengths[score][0]}",
+        text_color=strengths[score][1], #Change text color
+        fg_color= colour.Color(strengths[score][1],luminance=0.1).hex_l #Utilize colour lib to make a darker version of the strength color
+    )
+    
 
-passlabel = Label( #Label to display password
-    passfrm,
-    foreground="blue",
-    font=("Arial",15,"bold"),
-    background="#C3DBC5",
-    padx=10,
-    pady=10,
-)
-passlabel.grid()
+passentry.grid(padx=10,pady=10) #TextBox for Password
+passentry.bind("<Return>", lambda event: strengthcheck())
 strengthlabel.grid()
 
 
 
 wordvar = StringVar() #Variable to store entry input
 
-wordentry = Entry( #Entry widget
+wordentry = CTkEntry( #Entry widget
     settfrm,
     textvariable=wordvar
 )
@@ -178,11 +202,14 @@ wordentry = Entry( #Entry widget
 
 
 def genpassword():
-    
+    print("----------------------------------------------------")
+    print("Generating Password!")
+    print("Desired Length of Password: ", sliderval.get())
+    start_time = time.time()
     word = wordvar.get().strip()
-    if len(word) >= lenslider.get():
+    if len(word) >= sliderval.get():
         warninglabel.configure(text="Word too long, \nplease enter a shorter word or increase password length",justify="left")
-        warninglabel.grid(column=0,row=9,sticky="w")
+        warninglabel.grid(column=0,row=9,sticky="w",padx=10, pady=10)
         return None
     else:
         warninglabel.grid_forget()
@@ -194,54 +221,69 @@ def genpassword():
     pw =""
     print(validchars)
     
-    for j in range(lenslider.get()-len(word)):
+    for j in range(int(sliderval.get())-len(word)-1):
         randindex = random.randint(0,len(validchars)-1)
         print("Random Chosen Index: ",randindex)
         pw += validchars[randindex]
         print("Password Progress: ",pw)
 
     if word != "":
-        wordrand = random.randint(0,len(pw)-1)
-        print("Word Insertion Index: ",wordrand)
-        pw = pw[:wordrand] + word + pw[wordrand:]
+        if bool(random.getrandbits): #Get a random bit (1 or 0) and convert it to a boolean, random boolean
+            print("Attaching Word to: FRONT")
+            pw = word + "-" + pw
+        else:
+            print("Attaching Word to: BACK")
+            pw += '-' + word
     
-    passlabel.config(text=pw)
+    end_time = time.time()
+    print("Password generated in: ", (end_time-start_time)*1000, "ms")
+    passentry.delete("1.0","end-1c") #Clear password textbox
+    passentry.insert("0.0",pw) #Insert new password into textbox
     print("Final Password:", pw)
-    strengthcheck(pw)
+
+    strengthcheck() #Test password strength
 
 
-CTkLabel(settfrm, text="Password Length",font=("Arial",10,"bold")).grid(column=0,row=1,sticky="w")
+CTkLabel(settfrm, text="Password Length",font=("Arial",20,"bold")).grid(column=0,row=1,sticky="w",padx=10,pady=10)
 
-chramtlabel = CTkLabel(settfrm, text="Character Amount: 8",font=("Arial",6,"bold"))
-chramtlabel.grid(column=0,row=1,sticky="e")
+chramtlabel = CTkLabel(settfrm, text="Character Amount: 8",font=("Arial",14,"bold"))
+chramtlabel.grid(column=0,row=1,sticky="e",padx=10)
+sliderval = IntVar(value=8)
 
-lenslider = Scale(
+CTkSlider(
     settfrm, 
+    variable=sliderval,
     from_=8, 
-    to=40, 
-    orient=HORIZONTAL,
-    sliderlength=10,
-    length=350,
-    showvalue=False,
-    command=lambda x:chramtlabel.configure(
-        text=f"Character Amount: {lenslider.get()}"
+    to=40,
+    width=350,
+    number_of_steps=32,
+    command=lambda x : chramtlabel.configure(
+        text=f"Character Amount: {sliderval.get()}"
     ),
-)
-
-lenslider.grid(column=0,row=2,rowspan=True,sticky="nswe")
-
-CTkButton(
-    mainfrm, 
-    text="Generate", 
-    command=genpassword
 ).grid(
     column=0,
-    row=1
+    row=2,
+    rowspan=True,
+    sticky="nswe",
+    padx=10
 )
 
 
-CTkLabel(settfrm,text="Word to include in password",font=("Arial",10,"bold")).grid(sticky="w")
-wordentry.grid(sticky="w")
+
+
+CTkButton(
+    passfrm, 
+    text="Generate", 
+    command=genpassword,
+).grid(
+    column=0,
+    row=2,
+    pady=10
+)
+
+
+CTkLabel(settfrm,text="Word to include in password",font=("Arial",20,"bold")).grid(sticky="w",padx=10)
+wordentry.grid(sticky="w",padx=10,pady=10)
 
 
 genpassword()#Generate a password that will be displyed when the program is run
