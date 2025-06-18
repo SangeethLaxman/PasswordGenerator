@@ -171,6 +171,13 @@ passlabel = Label( #Label to display password
 )
 passlabel.grid()
 
+copybtn = ttk.Button( #Button to copy password
+    passfrm,
+    text="Copy",
+    command=lambda: root.clipboard_clear() or root.clipboard_append(passlabel.cget("text"))
+)
+copybtn.grid()
+
 wordvar = StringVar() #Variable to store entry input
 
 wordentry = Entry( #Entry widget
