@@ -15,7 +15,8 @@ import zxcvbn #ZXCVBN Password Strength Estimation Library by Dropbox
 
 
 
-
+set_default_color_theme("green")
+set_appearance_mode("light")
 
 #Obtain list of characters
 spchar = ["$","%","&","!","?","@","#","_","-","+","="]
